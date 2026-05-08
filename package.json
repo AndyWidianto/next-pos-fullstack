@@ -6,21 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:all": "tsx ./seeders/index.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^6.19.3",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "axios": "^1.16.0",
+    "bcryptjs": "^3.0.3",
+    "before": "^0.0.1",
+    "dotenv": "^17.4.2",
+    "framer-motion": "^12.38.0",
+    "html5-qrcode": "^2.3.8",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.14.0",
     "next": "16.2.4",
+    "pg": "^8.20.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.75.0",
+    "recharts": "^3.8.1",
+    "sonner": "^2.0.7",
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.19.39",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
