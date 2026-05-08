@@ -6,7 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import useInventory from '@/app/hooks/inventoryHook';
 import { AnimateMotion } from '@/app/components/MotionModal';
 import { FormModal } from '@/app/components/FormModal';
-import { InputText, Select, TextArea } from '@/app/components/Inputs';
+import { InputText, Select } from '@/app/components/Inputs';
 import { ProductUnit } from '@prisma/client';
 import ProductScanner from '@/app/components/ProductScanner';
 
