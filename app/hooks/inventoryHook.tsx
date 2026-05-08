@@ -1,6 +1,6 @@
 import useAxios from "@/lib/axios.service";
 import { Category, Prisma } from "@prisma/client"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner";
 
 

@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Search, Filter, Download, Upload, Plus, Edit2, History, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, Download, Upload, Plus, Edit2, History, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import useCategory from '@/app/hooks/categoryHook';
 import { AnimateMotion } from '@/app/components/MotionModal';

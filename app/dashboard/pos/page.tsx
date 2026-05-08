@@ -2,7 +2,6 @@
 
 import { Search, Barcode, CreditCard, DollarSign, QrCode, Pause, Printer, Trash2, Plus, Minus, ShoppingCart, ChevronUp } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { toast } from 'sonner';
 import usePos from '@/app/hooks/postHook';
 import { AnimateMotion } from '@/app/components/MotionModal';
 import ProductScanner from '@/app/components/ProductScanner';

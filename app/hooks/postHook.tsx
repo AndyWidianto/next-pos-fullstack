@@ -157,6 +157,8 @@ export default function usePos() {
         setShowReceiptModal,
         showCamera,
         setShowCamera,
-        findProduct
+        findProduct,
+        setNextId,
+        setFilteredProducts
     }
 }
