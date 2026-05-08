@@ -1,9 +1,17 @@
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('admin', 'kasir', 'user');
+
+-- CreateEnum
+CREATE TYPE "ProductUnit" AS ENUM ('PCS', 'PACK', 'BOX', 'KG', 'GR', 'LITER', 'MTR');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
+    "name" TEXT,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'user',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
 
@@ -14,7 +22,7 @@ CREATE TABLE "users" (
 CREATE TABLE "Category" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "icon" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -27,8 +35,10 @@ CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "sku" TEXT NOT NULL,
+    "code" TEXT NOT NULL DEFAULT '',
     "price" DECIMAL(12,2) NOT NULL,
     "stock" INTEGER NOT NULL,
+    "init" "ProductUnit" NOT NULL DEFAULT 'PCS',
     "categoryId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -60,6 +70,12 @@ CREATE TABLE "transaction_items" (
 
     CONSTRAINT "transaction_items_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "transactions_invoice_number_key" ON "transactions"("invoice_number");
