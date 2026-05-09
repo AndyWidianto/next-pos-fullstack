@@ -21,7 +21,7 @@ export default function useInventory() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [products, setProducts] = useState<ProductWithCategory[]>([]);
     const [loading, setLoading] = useState(false);
-    const [selectCategory, setSelectCategory] = useState("all");
+    const [selectCategory, setSelectCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [showStockModal, setShowStockModal] = useState(false);
@@ -41,17 +41,15 @@ export default function useInventory() {
         stock: 0,
         init: "",
     });
-
-    const itemsPerPage = 10;
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextId, setNextId] = useState<string | null>(null);
+    const itemsPerPage = 2;
 
     const filteredProducts = products.filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             product.sku.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = selectCategory === 'all' || product.category.name === selectCategory;
-        return matchesSearch && matchesCategory;
+        return matchesSearch;
     });
-
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
     const paginatedProducts = filteredProducts.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
@@ -84,12 +82,19 @@ export default function useInventory() {
             console.error(err);
         }
     }
-    async function fetchProducts() {
+    async function fetchProducts(lastId?: string) {
+        let query = `${searchQuery ? `&search=${searchQuery}` : ''}${selectCategory ? `&category=${selectCategory}` : ``}${lastId ? `&lastId=${lastId}` : ''}`;
         try {
-            const res = await apiPrivate.get(`/products`);
-            console.log(res.data)
+            const res = await apiPrivate.get(`/products?limit=${itemsPerPage}${query}`);
             const data = res.data;
-            setProducts(prev => [...data.products, ...prev]);
+            if (data.products.length < itemsPerPage) {
+                setNextId(null);
+            } else {
+                setNextId(data.products[data.products.length - 1].id);
+            }
+            setProducts(prev => [...prev, ...data.products]);
+            setTotalPages(data.totalPage);
+            console.log(data.total);
         } catch (err: any) {
             console.error(err);
             const errorMessage = err.response?.data?.message || "Gagal menagmbil data products.";
@@ -205,10 +210,26 @@ export default function useInventory() {
         }
     };
 
+    const handlePrev = () => {
+        setCurrentPage(Math.max(1, currentPage - 1));
+    }
+    const handleCurrent = async () => {
+        setCurrentPage(Math.min(totalPages, currentPage + 1))
+        if ((currentPage + 1) * itemsPerPage > products.length && nextId) {
+            fetchProducts(nextId);
+        }
+    }
+
     useEffect(() => {
-        fetchProducts();
         fetchCategories();
-    }, [])
+    }, []);
+    useEffect(() => {
+        setProducts([]);
+        const timer = setTimeout(() => fetchProducts(), 500);
+        return () => {
+            clearTimeout(timer);
+        }
+    }, [searchQuery, selectCategory]);
 
     return {
         categories,
@@ -248,6 +269,8 @@ export default function useInventory() {
         showCamera,
         setShowCamera,
         handleUpdate,
-        handleDelete
+        handleDelete,
+        handlePrev,
+        handleCurrent
     }
 }

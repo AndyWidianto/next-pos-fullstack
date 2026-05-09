@@ -56,11 +56,13 @@ export default function Inventory() {
     showCamera,
     setShowCamera,
     handleUpdate,
-    handleDelete
+    handleDelete,
+    handlePrev,
+    handleCurrent
   } = useInventory();
 
   return (
-    <div className="p-8">
+    <div className="p-2 md:p-8">
       <AnimateMotion isOpen={showCreateModal} onClose={handleClose}>
         <FormModal title={productId ? "Update Product" : "Create Product"} loading={loading} isOpen={showCreateModal} onClose={handleClose} onSubmit={handleSubmit} >
           <InputText label='Name*' onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))} defaultValue={formData.name} />
@@ -92,7 +94,7 @@ export default function Inventory() {
         <ProductScanner onResult={(result) => setFormData(prev => ({ ...prev, code: result }))} />
       </AnimateMotion>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Manajemen Inventaris</h1>
           <p className="text-gray-600 mt-1">Kelola stok produk dan data inventaris</p>
@@ -250,14 +252,14 @@ export default function Inventory() {
           </p>
           <div className="flex gap-2">
             <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              onClick={handlePrev}
               disabled={currentPage === 1}
               className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              onClick={handleCurrent}
               disabled={currentPage === totalPages}
               className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >

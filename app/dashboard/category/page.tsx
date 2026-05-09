@@ -45,7 +45,7 @@ export default function Inventory() {
     } = useCategory();
 
     return (
-        <div className="p-8">
+        <div className="p-2 md:p-8">
             <AnimateMotion isOpen={showCreateModal} onClose={handleClose}>
                 <FormModal title={categoryId ? "Update Category" : "Create Category"} loading={loading} isOpen={showCreateModal} onClose={handleClose} onSubmit={handleSubmit} >
                     <InputText label='Name' onChange={(e) => setFormData(prev => ({...prev, name: e.target.value }))} defaultValue={formData.name} /> 
@@ -54,7 +54,7 @@ export default function Inventory() {
                 </FormModal>
             </AnimateMotion>
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Manajemen Inventaris</h1>
                     <p className="text-gray-600 mt-1">Kelola stok produk dan data inventaris</p>

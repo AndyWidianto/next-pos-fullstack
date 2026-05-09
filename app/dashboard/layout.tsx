@@ -1,5 +1,5 @@
 "use client";
-import { LayoutDashboard, Package, ShoppingCart, Wifi, WifiOff, Store, Grid3x2, Box } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Wifi, WifiOff, Store, Menu, Box } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -10,6 +10,7 @@ interface LayoutProps {
 }
 export default function MainLayout({ children }: LayoutProps) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentStore, setCurrentStore] = useState('Toko Pusat');
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,7 +36,8 @@ export default function MainLayout({ children }: LayoutProps) {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div onClick={() => setIsSidebarOpen(false)} className={`bg-black/20 fixed w-full h-screen lg:hidden z-40 ${isSidebarOpen ? "block" : "hidden"}`}></div>
+      <aside className={`fixed h-screen bg-white border-r border-gray-200 flex flex-col overflow-hidden transaction-all duration-300 ease z-50 ${isSidebarOpen ? 'w-64' : 'w-0 lg:w-64'}`}>
         {/* Logo & Store Selector */}
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">ModernPOS</h1>
@@ -59,7 +61,7 @@ export default function MainLayout({ children }: LayoutProps) {
               key={item.to}
               href={item.to}
               className={
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${ pathname == item.to
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${pathname == item.to
                   ? 'bg-blue-50 text-blue-600 font-medium'
                   : 'text-gray-700 hover:bg-gray-50'
                 }`
@@ -91,7 +93,13 @@ export default function MainLayout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className={`flex-1 min-w-0 overflow-auto ${isSidebarOpen ? 'lg:ml-64' : 'm-0 lg:ml-64'}`}>
+        <div className={`fixed left-0 w-full flex lg:hidden justify-end bg-white shadow-md z-20`}>
+          <button onClick={() => setIsSidebarOpen(true)} className="p-3 px-3 rounded-md">
+            <Menu size={25} />
+          </button>
+        </div>
+        <div className="mt-10 lg:mt-0"></div>
         {children}
       </main>
     </div>

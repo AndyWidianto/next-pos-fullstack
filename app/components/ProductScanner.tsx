@@ -20,13 +20,10 @@ export default function ProductScanner({ onResult }: { onResult: (val: string) =
             await scannerRef.current?.start(
                 { facingMode: "environment" },
                 {
-                    fps: 20,
-                    qrbox: { width: 280, height: 180 },
-                    // TAMBAHKAN INI: Paksa resolusi video agar lebih tajam
+                    fps: 30,
                     videoConstraints: {
                         width: { min: 640, ideal: 1280, max: 1920 },
                         height: { min: 480, ideal: 720, max: 1080 },
-                        facingMode: "environment"
                     }
                 },
                 (text) => {
