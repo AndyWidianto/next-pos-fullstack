@@ -9,11 +9,12 @@ const prisma = new PrismaClient();
 export default async function User() {
     const password = await bcrypt.hash(process.env.PASSWORD!, 10);
     const email = process.env.EMAIL!;
+    const username = process.env.USERNAME!;
     const user = await prisma.user.upsert({
         where: { email: email },
         update: {}, 
         create: {
-            username: "Andy",
+            username: username,
             password: password,
             role: "admin",
             email: email,
