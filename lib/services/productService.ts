@@ -198,7 +198,7 @@ export async function statsProduct(token: string) {
     });
     const productBestSeller: BestSeller[] = bestSeller.map(b => {
         const detail = productsDetail.find(p => p.id === b.productId);
-        const totalSold = b._sum.quantity || 0;
+        const totalSold = b?._sum?.quantity || 0;
         const price = detail?.price?.toNumber() || 0;
 
         return {
