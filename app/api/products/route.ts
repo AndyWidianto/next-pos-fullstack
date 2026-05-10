@@ -27,7 +27,12 @@ export async function GET(req: NextRequest) {
         const lastId = searchParams.get("lastId");
         const search = searchParams.get("search");
         const category = searchParams.get("category");
-        const products = await getProducts(limit, lastId, search, category);
+        const headers = req.headers;
+        const token = headers.get("Authorization")?.split(" ")[1];
+        if (!token) {
+            return NextResponse.json({ message: "Unauthorization" }, { status: 401 });
+        }
+        const products = await getProducts(token, limit, lastId, search, category);
         return NextResponse.json(products);
     } catch (err) {
         console.error("Terjadi Kesalahan: ", err);

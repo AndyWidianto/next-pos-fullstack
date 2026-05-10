@@ -16,7 +16,8 @@ export async function createCategory(token: string, data: CreateCategory) {
     return category;
 }
 
-export async function getCategories(limitStr?: string | null, lastId?: string | null, search?: string | null) {
+export async function getCategories(token: string, limitStr?: string | null, lastId?: string | null, search?: string | null) {
+    verifyAccessToken(token);
     let query: Prisma.CategoryFindManyArgs = {};
     let limit = 10;
     if (lastId) {
@@ -24,7 +25,8 @@ export async function getCategories(limitStr?: string | null, lastId?: string | 
             ...query,
             cursor: {
                 id: lastId
-            }
+            },
+            skip: 1
         }
     }
     if (limitStr) {
@@ -51,11 +53,27 @@ export async function getCategories(limitStr?: string | null, lastId?: string | 
             }
         }
     }
+    query = {
+        ...query,
+        take: limit,
+        orderBy: {
+            id: "desc"
+        }
+    }
 
-    const categories = await prisma.category.findMany({
-        ...query
-    });
-    return categories;
+    const [categories, total] = await prisma.$transaction([
+        prisma.category.findMany({
+            ...query
+        }),
+        prisma.category.count({
+            where: query.where
+        })
+    ]);
+    return {
+        categories,
+        total: total,
+        totalPage: Math.ceil(total / limit)
+    };
 }
 
 export async function findOne(id: string) {

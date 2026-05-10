@@ -2,7 +2,7 @@ import { Prisma, Product } from "@prisma/client";
 import { AppError, BadRequestError, ForbiddenError } from "../exception";
 import { prisma } from "../prisma";
 import { verifyAccessToken } from "../token.service";
-import { CreateProduct, UpdateProduct } from "../types/product";
+import { BestSeller, CreateProduct, LowStock, UpdateProduct } from "../types/product";
 import * as XLSX from "xlsx";
 
 
@@ -60,7 +60,8 @@ export async function updateProduct(token: string, id: string, data: UpdateProdu
     console.log(productUpdate);
     return productUpdate;
 }
-export async function getProducts(limitStr?: string | null, lastId?: string | null, search?: string | null, category?: string | null) {
+export async function getProducts(token: string, limitStr?: string | null, lastId?: string | null, search?: string | null, category?: string | null) {
+    verifyAccessToken(token);
     const limit = limitStr ? Number(limitStr) : 20;
 
     const whereClause: Prisma.ProductWhereInput = {
@@ -113,12 +114,12 @@ export async function deleteProduct(token: string, id: string) {
 
 export async function uploadExcel(file: File) {
     const categories = await prisma.category.findMany();
-    
+
     const arrayBuffer = await file.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: "buffer" });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    
+
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
     const keyAllowed = ["name", "code", "price", "stock", "init", "category"];
@@ -132,16 +133,16 @@ export async function uploadExcel(file: File) {
 
             if (key === "price" || key === "stock") {
                 product[key] = Number(value) || 0;
-            } 
+            }
             else if (key === "category") {
                 const foundCategory = categories.find(
                     c => c.name.toLowerCase() === String(value).toLowerCase()
                 );
-                
+
                 if (foundCategory) {
                     product["categoryId"] = foundCategory.id;
                 }
-            } 
+            }
             else {
                 product[key] = value;
             }
@@ -163,3 +164,61 @@ export async function uploadExcel(file: File) {
 
     return result;
 }
+
+export async function statsProduct(token: string) {
+    verifyAccessToken(token);
+    const [totalProduct, lowStock, bestSeller] = await prisma.$transaction([
+        prisma.product.count(),
+        prisma.product.findMany({
+            where: {
+                stock: {
+                    lte: 50
+                }
+            }
+        }),
+        prisma.transactionItem.groupBy({
+            by: ['productId'],
+            _sum: {
+                quantity: true,
+            },
+            orderBy: {
+                _sum: {
+                    quantity: 'desc',
+                },
+            },
+            take: 5,
+        })
+    ]);
+
+    const productIds = bestSeller.map(b => b.productId);
+    const productsDetail = await prisma.product.findMany({
+        where: {
+            id: { in: productIds }
+        }
+    });
+    const productBestSeller: BestSeller[] = bestSeller.map(b => {
+        const detail = productsDetail.find(p => p.id === b.productId);
+        const totalSold = b._sum.quantity || 0;
+        const price = detail?.price?.toNumber() || 0;
+
+        return {
+            id: b.productId,
+            name: detail?.name || "Unknown",
+            revenue: totalSold * price,
+            sold: totalSold
+        };
+    });
+    const productLowStock: LowStock[] = lowStock.map(l => ({
+        id: l.id,
+        name: l.name,
+        stock: l.stock,
+        minStock: 50
+    }))
+    return {
+        total: totalProduct,
+        alerts: lowStock.length,
+        lowStock: productLowStock,
+        bestSeller: productBestSeller
+    }
+}
+

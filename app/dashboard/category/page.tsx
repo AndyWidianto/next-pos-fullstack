@@ -41,7 +41,9 @@ export default function Inventory() {
         iconOptions,
         handleUpdate,
         handleDelete,
-        categoryId
+        categoryId,
+        handleCurrent,
+        handlePrev
     } = useCategory();
 
     return (
@@ -161,14 +163,14 @@ export default function Inventory() {
                     </p>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            onClick={handlePrev}
                             disabled={currentPage === 1}
                             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
-                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            onClick={handleCurrent}
                             disabled={currentPage === totalPages}
                             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >

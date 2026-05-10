@@ -20,6 +20,8 @@ export default function useCategory() {
     });
     const [categoryId, setCategoryId] = useState<string | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextId, setNextId] = useState<string | null>(null);
     const { apiPrivate } = useAxios();
     const itemsPerPage = 10;
 
@@ -28,8 +30,6 @@ export default function useCategory() {
             category.description?.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesSearch;
     });
-
-    const totalPages = Math.ceil(filteredCategory.length / itemsPerPage);
     const paginationCategory = filteredCategory.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
@@ -62,11 +62,19 @@ export default function useCategory() {
     };
 
 
-    async function fetchCategories() {
+    async function fetchCategories(lastId?: string) {
         try {
-            const res = await apiPrivate.get("/categories");
+            let query = `${searchQuery ? `&search=${searchQuery}` : ''}${lastId ? `&lastId=${lastId}`: ''}`;
+            const res = await apiPrivate.get(`/categories?limit=${itemsPerPage}${query}`);
             const data = res.data;
-            setCategories(data); //prev => [...prev, ...data]
+            setTotalPages(data.totalPage);
+            if (data.categories.length < itemsPerPage) {
+                setNextId(null);
+            } else {
+                setNextId(data.categories[data.categories.length - 1].id);
+            }
+            setCategories(prev => [...prev, ...data.categories]);
+            console.log(data);
         } catch (err) {
             console.error(err);
         }
@@ -155,9 +163,22 @@ export default function useCategory() {
             icon: ""
         })
     }
+
+    const handlePrev = () => {
+        setCurrentPage(Math.max(1, currentPage - 1));
+    }
+    const handleCurrent = async () => {
+        setCurrentPage(Math.min(totalPages, currentPage + 1));
+        if ((currentPage + 1) * itemsPerPage > categories.length && nextId) {
+            fetchCategories(nextId);
+        }
+    }
     useEffect(() => {
-        fetchCategories();
-    }, []);
+        const timer = setTimeout(() => fetchCategories(), 500);
+        return () => {
+            clearTimeout(timer);
+        }
+    }, [searchQuery]);
 
     return {
         categories,
@@ -187,6 +208,8 @@ export default function useCategory() {
         iconOptions,
         handleUpdate,
         handleDelete,
-        categoryId
+        categoryId,
+        handlePrev,
+        handleCurrent
     }
 }

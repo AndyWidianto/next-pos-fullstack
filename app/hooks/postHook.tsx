@@ -1,4 +1,5 @@
 import useAxios from "@/lib/axios.service";
+import { CreateTransaction, CreateTransactionItem } from "@/lib/types";
 import { Product } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,6 +23,14 @@ export default function usePos() {
     const [filteredProducts, setFilteredProducts] = useState(products);
     const [showCamera, setShowCamera] = useState(false);
     const limit = 10;
+
+
+    const calculateTotal = () => {
+        return cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+    };
+    const total = calculateTotal();
+    const tax = total * 0.1;
+    const grandTotal = total + tax;
 
     const addToCart = (product: Product) => {
         const existingItem = cart.find((item) => item.id === product.id);
@@ -52,16 +61,12 @@ export default function usePos() {
         toast.success('Item dihapus dari keranjang');
     };
 
-    const calculateTotal = () => {
-        return cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-    };
-
     const calculateChange = () => {
         const received = parseFloat(cashReceived) || 0;
         return received - calculateTotal();
     };
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
         if (cart.length === 0) {
             toast.error('Keranjang kosong');
             return;
@@ -70,8 +75,32 @@ export default function usePos() {
             toast.error('Uang tidak cukup');
             return;
         }
-        setShowPaymentModal(false);
-        setShowReceiptModal(true);
+        try {
+            const items: CreateTransactionItem[] = [];
+            cart.forEach(c => {
+                items.push({
+                    productId: c.id,
+                    priceAtTime: Number(c.price),
+                    quantity: c.quantity,
+                })
+            })
+            const dataToSend: CreateTransaction = {
+                discount: 0,
+                tax: tax,
+                totalPrice: total,
+                paymentMethod: paymentMethod,
+                items: items
+            }
+            const res = await apiPrivate.post("/transactions", dataToSend);
+            const data = res.data;
+            console.log(data);
+            setShowPaymentModal(false);
+            setShowReceiptModal(true);
+        } catch (err: any) {
+            console.error(err);
+            const errorMessage = err.response?.data?.message || "Gagal menagmbil data products.";
+            toast.error(errorMessage);
+        }
     };
 
     const handlePrintReceipt = () => {
@@ -85,10 +114,6 @@ export default function usePos() {
         toast.success('Transaksi ditunda');
         setCart([]);
     };
-
-    const total = calculateTotal();
-    const tax = total * 0.1;
-    const grandTotal = total + tax;
 
 
     async function fetchProducts() {

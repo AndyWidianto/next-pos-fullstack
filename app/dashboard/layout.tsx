@@ -1,7 +1,8 @@
 "use client";
+import useAuthStore from '@/lib/store/authStore';
 import { LayoutDashboard, Package, ShoppingCart, Wifi, WifiOff, Store, Menu, Box } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 
@@ -9,6 +10,7 @@ interface LayoutProps {
   children: React.ReactNode
 }
 export default function MainLayout({ children }: LayoutProps) {
+  const { isAuthenticated, accessToken } = useAuthStore();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentStore, setCurrentStore] = useState('Toko Pusat');
@@ -19,8 +21,12 @@ export default function MainLayout({ children }: LayoutProps) {
     { to: '/dashboard/pos', label: 'Kasir', icon: ShoppingCart },
   ];
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
+    if (!accessToken && !isAuthenticated) {
+      router.push("/login");
+    }
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 

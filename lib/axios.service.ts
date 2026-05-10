@@ -16,6 +16,10 @@ export default function useAxios() {
     });
     apiPrivate.interceptors.request.use(
         async (config) => {
+            const availableToken = config.headers.Authorization?.toString().split(" ")[1];
+            if (availableToken) {
+                return config;
+            }
             config.headers.Authorization = `Bearer ${accessToken}`;
             return config;
         },
@@ -35,7 +39,7 @@ export default function useAxios() {
                     const response = await apiPublic.post("/refreshToken", { withCredentials: true });
 
                     const { accessToken: token } = response.data;
-                    console.log("AccessToken Baru: ", accessToken);
+                    console.log("AccessToken Baru: ", token);
 
                     setAccessToken(token);
                     originalRequest.headers.Authorization = `Bearer ${token}`;

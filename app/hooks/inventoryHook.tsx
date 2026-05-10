@@ -43,7 +43,7 @@ export default function useInventory() {
     });
     const [totalPages, setTotalPages] = useState(0);
     const [nextId, setNextId] = useState<string | null>(null);
-    const itemsPerPage = 2;
+    const itemsPerPage = 10;
 
     const filteredProducts = products.filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,7 +77,7 @@ export default function useInventory() {
         try {
             const res = await apiPrivate.get("/categories");
             const data = res.data;
-            setCategories(data); //prev => [...prev, ...data]
+            setCategories(data.categories); //prev => [...prev, ...data]
         } catch (err) {
             console.error(err);
         }

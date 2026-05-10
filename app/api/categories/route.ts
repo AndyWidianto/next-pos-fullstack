@@ -30,12 +30,20 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+    const headers = req.headers;
+    const auth = headers.get("Authorization");
+    const token = auth?.split(" ")[1];
+    if (!token) {
+        return NextResponse.json({ message: "Unauthorization" }, {
+            status: 401
+        });
+    }
     const { searchParams } = new URL(req.url);
     const limit = searchParams.get("limit");
     const lastId = searchParams.get("lastId");
     const search = searchParams.get("search");
     try {
-        const categories = await getCategories(limit, lastId, search);
+        const categories = await getCategories(token, limit, lastId, search);
         return NextResponse.json(categories);
     } catch (err) {
         console.error(err);

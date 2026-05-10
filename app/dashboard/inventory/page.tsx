@@ -9,6 +9,7 @@ import { FormModal } from '@/app/components/FormModal';
 import { InputText, Select } from '@/app/components/Inputs';
 import { ProductUnit } from '@prisma/client';
 import ProductScanner from '@/app/components/ProductScanner';
+import CategorySelector from '@/app/components/SelectCategory';
 
 
 const auditLog = [
@@ -19,7 +20,6 @@ const auditLog = [
 
 export default function Inventory() {
   const {
-    products,
     categories,
     selectCategory,
     setSelectCategory,
@@ -140,20 +140,8 @@ export default function Inventory() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
-            <select
-              value={selectCategory}
-              onChange={(e) => setSelectCategory(e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">All</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name.toLocaleLowerCase()}
-                </option>
-              ))}
-            </select>
+          <div className="w-sm">
+            <CategorySelector categories={categories} selectCategory={selectCategory} setSelectCategory={setSelectCategory} />
           </div>
 
           <button

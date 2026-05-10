@@ -105,3 +105,5 @@ model TransactionItem {
 
   @@map("transaction_items")
 }
+
+

@@ -48,7 +48,7 @@ export default function POSCashier() {
       {/* LEFT: Product Selection */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Header/Search Area */}
-        <div className="p-4 lg:p-6 bg-white border-b lg:bg-transparent lg:border-none">
+        <div className="fixed top-10 w-full md:static p-4 lg:p-6 bg-white lg:bg-transparent border-none">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
             <input
@@ -64,6 +64,7 @@ export default function POSCashier() {
             </button>
           </div>
         </div>
+        <div className="mt-20 md:mt-0"></div>
 
         {/* Product Grid Area */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 lg:pt-0 pb-32 lg:pb-6">
